@@ -226,16 +226,13 @@ class MaxP2P extends WebSocketBasedP2P {
     await Future.wait(promises);
   }
 
-  Future<void> send(final Serialize s) async {
-    final conn = await mutex.protect(() async {
-      return _readyConnections!.get();
-    });
-    await conn.send(s);
-    await mutex.protect(() async {
-      return _readyConnections!.put(conn);
-    });
+  Future<int> send(final Serialize s) async {
+    final conn = await _readyConnections!.get();
+    final ret = await conn.send(s);
+    await _readyConnections!.put(conn);
     // final conn = connectionsMap.values.first.values.first;
-    // await conn.send(s);
+    // final ret = await conn.send(s);
+    return ret;
   }
 
   Future<void> close() async {
