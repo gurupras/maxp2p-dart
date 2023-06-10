@@ -232,6 +232,9 @@ class Packer {
   }
 
   void packInt(int? val, int size, [signed = false]) {
+    // We need a total of size+1 bytes to write this value.
+    // Check if we can do so and if not, flush
+    if (_buf.length - _offset < (size + 1)) _nextBuf();
     int header = 0xcc;
     if (signed) {
       header = 0xd0;
